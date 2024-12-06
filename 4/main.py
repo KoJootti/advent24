@@ -1,36 +1,36 @@
 from enum import Enum
 input_file = "input.txt"
 
-search_term = "XMAS"
+search_term = "MAS"
 
-test_input = """MMMSXXMASM
-MSAMXMSMSA
-AMXSXMAAMM
-MSAMASMSMX
-XMASAMXAMM
-XXAMMXXAMA
-SMSMSASXSS
-SAXAMASAAA
-MAMMMXMMMM
-MXMXAXMASX
+test_input = """.M.S......
+..A..MSMS.
+.M.S.MAA..
+..A.ASMSM.
+.M.S.M....
+..........
+S.S.S.S.S.
+.A.A.A.A..
+M.M.M.M.M.
+..........
 """
 
 
 class Direction(Enum):
-  UP = "UP"
-  DOWN = "DOWN"
-  LEFT = "LEFT"
-  RIGHT = "RIGHT"
+  #UP = "UP"
+  #DOWN = "DOWN"
+  #LEFT = "LEFT"
+  #RIGHT = "RIGHT"
   UP_LEFT = "UP_LEFT"
   UP_RIGHT = "UP_RIGHT"
   DOWN_LEFT = "DOWN_LEFT"
   DOWN_RIGHT = "DOWN_RIGHT"
 
 direction_to_coord = {
-  Direction.UP: (-1, 0),
-  Direction.DOWN: (1, 0),
-  Direction.LEFT: (0, -1),
-  Direction.RIGHT: (0, 1),
+  #Direction.UP: (-1, 0),
+  #Direction.DOWN: (1, 0),
+  #Direction.LEFT: (0, -1),
+  #Direction.RIGHT: (0, 1),
   Direction.UP_LEFT: (-1, -1),
   Direction.UP_RIGHT: (-1, 1),
   Direction.DOWN_LEFT: (1, -1),
@@ -92,19 +92,40 @@ def solve(input: str) -> int:
   arr = input_to_2d_array(input=input)
   first_term_occurences = find_all_first_search_term_occurences(arr=arr)
   sum_of_occurences = 0
+  crossing_occurences = 0
+  occurence_a_positions = []
   for coord in first_term_occurences:
     directions = find_all_search_occurences_starting_from_position(coord=coord, arr=arr)
     sum_of_occurences += len(directions)
+    for direction in directions:
+      direction_coords = direction_to_coord[direction]
+      # The 'A' position is always the second position in the direction
+      a_pos = (coord[0] + direction_coords[0], coord[1] + direction_coords[1])
+      occurence_a_positions.append(a_pos)
 
-  return sum_of_occurences
+  position_occurences = {}
+  for a_pos in occurence_a_positions:
+    if a_pos not in position_occurences:
+      position_occurences[a_pos] = 0
+
+    position_occurences[a_pos] += 1
+
+  for pos, occurence in position_occurences.items():
+    crossings = int(occurence / 2)
+    crossing_occurences += crossings
+    print(f"Position {pos} has {occurence} occurences, {crossings} crossings")
+
+  return (sum_of_occurences, crossing_occurences)
 
 def main():
-  answer = solve(test_input)
+  answer, p2_answer = solve(test_input)
   print("Answer:", answer)
+  print("P2 Answer:", p2_answer)
   with open(input_file, "r") as file:
     file_input = file.read()
-    answer = solve(file_input)
+    answer, p2_answer = solve(file_input)
     print("Real answer:", answer)
+    print("Real P2 answer:", p2_answer)
 
 
 if __name__ == '__main__':
